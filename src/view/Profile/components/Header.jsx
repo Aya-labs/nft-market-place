@@ -3,7 +3,7 @@ import avater from "../../../assets/img/avatar.png";
 import { CustomButton } from "../../../components/buttons/CustomButton";
 
 const Header = () => {
-  const walletAddy = localStorage?.getItem("Address");
+  const walletAddy = sessionStorage?.getItem("Address");
   function hideCharacters(str) {
     if (str.length <= 9) {
       return str; // Return the original string if it's 9 characters or less

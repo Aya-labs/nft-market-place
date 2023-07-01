@@ -57,12 +57,12 @@ const MarketPlace = () => {
 
   const mintToken = async (uri) => {
     toggleLoading();
-    console.log(localStorage?.getItem("Address"));
+    console.log(sessionStorage?.getItem("Address"));
     try {
       // Call the 'mint' method on the contract
       const result = await tokenContract.methods
         .mint(uri)
-        .send({ from: localStorage?.getItem("Address") }); // Replace with your address
+        .send({ from: sessionStorage?.getItem("Address") }); // Replace with your address
       toggleLoading();
       ToastNotify({
         type: "success",

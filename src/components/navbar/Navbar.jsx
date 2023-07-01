@@ -7,6 +7,7 @@ import WC from "../../assets/img/wc.png";
 import Coinbase from "../../assets/img/coinbase.png";
 import Phantom from "../../assets/img/phantom.png";
 import useToggle from "../../utils/hooks/useToggle";
+import { ToastNotify } from "../reusables/helpers/ToastNotify";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -14,42 +15,52 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [centerModal, toggleCenterModal] = useToggle();
   const [selectedAccount, setSelectedAccount] = useState("");
-  const [networkName, setNetworkName] = useState("");
+  const [userAddress, setUserAddress] = useState("");
 
   const isWeb3Available = () => {
     return Boolean(window.ethereum);
   };
 
   useEffect(() => {
-    if (localStorage.getItem("Address") !== "") {
-      setSelectedAccount(localStorage.getItem("Address"));
+    const storedAddress = sessionStorage.getItem("Address");
+    if (storedAddress !== null && storedAddress !== "") {
+      setSelectedAccount(storedAddress);
     }
   }, []);
 
-  const connectWithMetaMask = () => {
-    if (isWeb3Available()) {
-      // Check if MetaMask is the selected wallet
-      if (window.ethereum.isMetaMask) {
-        window.ethereum
-          .request({ method: "eth_requestAccounts" })
-          .then((accounts) => {
-            // Handle successful connection
-            // Store the selected account address for future use
-            const selectedWalletAccount = accounts[0];
-            setSelectedAccount(selectedWalletAccount);
-            localStorage.setItem("Address", selectedWalletAccount);
-          })
-          .catch((error) => {
-            // Handle connection error
-            console.error("MetaMask connection error:", error);
+  const connectWithMetaMask = async () => {
+    try {
+      if (isWeb3Available()) {
+        // Check if MetaMask is the selected wallet
+        if (window.ethereum.isMetaMask) {
+          const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
           });
+          toggleCenterModal();
+          // Handle successful connection
+          // Store the selected account address for future use
+          const selectedWalletAccount = accounts[0];
+          setSelectedAccount(selectedWalletAccount);
+          sessionStorage.setItem("Address", selectedWalletAccount);
+          ToastNotify({
+            type: "success",
+            message: "Wallet Connected",
+            position: "top-center",
+          });
+        } else {
+          // MetaMask not detected
+          console.error("MetaMask not detected.");
+          toggleCenterModal();
+        }
       } else {
-        // MetaMask not detected
-        console.error("MetaMask not detected.");
+        // Web3 provider not available
+        console.error("Web3 provider not found.");
+        toggleCenterModal();
       }
-    } else {
-      // Web3 provider not available
-      console.error("Web3 provider not found.");
+    } catch (error) {
+      // Handle connection error
+      console.error("MetaMask connection error:", error);
+      toggleCenterModal();
     }
   };
 

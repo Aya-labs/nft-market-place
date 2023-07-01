@@ -46,7 +46,7 @@ const Menu = () => {
     try {
       const result = await marketContract.methods
         .putItemForSale(tokenId, price)
-        .send({ from: localStorage?.getItem("Address") });
+        .send({ from: sessionStorage?.getItem("Address") });
       toggleLoading();
       ToastNotify({
         type: "success",
